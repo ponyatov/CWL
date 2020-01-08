@@ -4,12 +4,19 @@ MODULE = $(notdir $(CWD))
 NOW = $(shell date +%d%m%y)
 REL = $(shell git rev-parse --short=4 HEAD)
 
-install: bin/python doc
+.PHONY: log.log
+log.log: bin/python CWL.py
+	$^ > $@ && tail $(TAIL) $@
+
+install: bin/python doc wiki/Home.md
 
 bin/python:
 	python3 -m venv .
 	bin/pip3 install -U pip
 	bin/pip3 install -U ply
+
+wiki/Home.md:
+	git clone -o gh git@github.com:ponyatov/CWL.wiki.git wiki
 
 WGET = wget -c
 
