@@ -31,7 +31,7 @@ merge:
 	git checkout master
 	git checkout shadow -- $(MERGE)
 
-release: pdf
+release:
 	git tag $(NOW)-$(REL)
 	git push -v && git push -v --tags
 	git checkout shadow
