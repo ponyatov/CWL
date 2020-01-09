@@ -72,6 +72,10 @@ class Frame:
     def __floordiv__(self,that):
         self.nest.append(that) ; return self
 
+    ###################################################################### eval
+
+    # generic Frame is unevaluatable
+    def eval(self): raise NotImplementedError(self)
 
 ########################################################## Hello World (Python)
 
@@ -79,7 +83,10 @@ print( Frame('Hello') // Frame('World') << Frame('left') >> Frame('right') )
 
 #################################################################### Primitives
 
-class Primitive(Frame): pass
+class Primitive(Frame):
+    # the main property of all primitive types: its value is itself
+    def eval(self): return self
+
 class Symbol(Primitive): pass
 class String(Primitive): pass
 class Number(Primitive): pass
@@ -87,7 +94,16 @@ class Number(Primitive): pass
 ######################################################################## Active
 
 class Active(Frame): pass
-class Operator(Active): pass
+
+class Operator(Active):
+    def eval(self):
+        if self.val == '//':
+            return self.nest[0].eval() // self.nest[1].eval()
+        if self.val == '>>':
+            return self.nest[0].eval() >> self.nest[1].eval()
+        if self.val == '<<':
+            return self.nest[0].eval() << self.nest[1].eval()
+        raise NotImplementedError(self)
 
 ########################################################################### PLY
 
@@ -123,7 +139,7 @@ def p_REPL_none(p):
     ' REPL : '
 def p_REPL_ex(p):
     ' REPL : REPL ex '
-    print(p[2])
+    print(p[2]) ; print (p[2].eval())
 def p_ex_sym(p):
     ' ex : symbol '
     p[0] = p[1]
@@ -137,13 +153,7 @@ parser = yacc.yacc(write_tables=False,debug=False)
 
 ################################################################### interpreter
 
-def INTERP(SRC):
-    parser.parse(SRC)
-    # lexer.input(SRC)
-    # while True:
-    #     token = lexer.token()
-    #     if not token: break
-    #     print(token)
+def INTERP(SRC): parser.parse(SRC)
 
 ################################################################ system startup
 
