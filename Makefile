@@ -5,8 +5,8 @@ NOW = $(shell date +%d%m%y)
 REL = $(shell git rev-parse --short=4 HEAD)
 
 .PHONY: log.log
-log.log: bin/python CWL.py
-	$^ > $@ && tail $(TAIL) $@
+log.log: bin/python CWL.py hello.cwl
+	$^ > $@
 
 install: bin/python doc wiki/Home.md
 
@@ -17,6 +17,10 @@ bin/python:
 
 wiki/Home.md:
 	git clone -o gh git@github.com:ponyatov/CWL.wiki.git wiki
+
+.PHONY: wiki
+wiki:
+	$(MAKE) -C $@
 
 WGET = wget -c
 
